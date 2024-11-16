@@ -19,17 +19,4 @@ model Users {
   username   String   @unique @db.VarChar(255)
   password   String   @db.VarChar(255)
   created_at DateTime @default(now())
-  notes      Notes[]
-
-  @@map("users")
-}
-
-model Notes {
-  id          String   @id @default(uuid()) @db.VarChar(255)
-  name        String   @db.VarChar(255)
-  description String   @db.VarChar(255)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  Users       Users?   @relation(fields: [Usersid], references: [id], onDelete: Cascade)
-  Usersid     String?  @db.VarChar(255)
 }
