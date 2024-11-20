@@ -15,8 +15,18 @@ datasource db {
 
 model Users {
   id         String   @id @default(uuid()) @db.VarChar(255)
-  fullname   String   @db.VarChar(255)
+  email      String   @db.VarChar(255)
   username   String   @unique @db.VarChar(255)
   password   String   @db.VarChar(255)
   created_at DateTime @default(now())
+  otp_verifications otp_verifications[]
 }
+
+model otp_verifications {
+  id        String   @id @default(uuid())
+  userId    String
+  otp       String  
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
