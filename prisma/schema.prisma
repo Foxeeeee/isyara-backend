@@ -14,19 +14,12 @@ datasource db {
 }
 
 model Users {
-  id         String   @id @default(uuid()) @db.VarChar(255)
-  email      String   @db.VarChar(255)
-  username   String   @unique @db.VarChar(255)
-  password   String   @db.VarChar(255)
-  created_at DateTime @default(now())
-  otp_verifications otp_verifications[]
+  id             String    @id @default(uuid()) @db.VarChar(255)
+  email          String    @unique @db.VarChar(255)
+  username       String    @unique @db.VarChar(255)
+  password       String    @db.VarChar(255)
+  created_at     DateTime  @default(now())
+  otp            String?   @db.VarChar(6)
+  otp_expired_at DateTime?
+  isVerifed      Boolean   @default(false)
 }
-
-model otp_verifications {
-  id        String   @id @default(uuid())
-  userId    String
-  otp       String  
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-}
-
