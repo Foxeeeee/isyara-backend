@@ -11,8 +11,8 @@ export const sendEmail = async (to, subject, text, html) => {
       html,
     });
 
-    return { success: true, message: `Email sent to ${mail.messageId}` };
+    return { success: true };
   } catch (error) {
-    return { success: false, message: "Failed to send email" };
+    return { success: false };
   }
 };
