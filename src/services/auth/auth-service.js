@@ -9,30 +9,33 @@ import { sendEmail } from "../../utilities/mailer/mailer.js";
 
 export const register = async (request) => {
   const otp = generatorOtp();
-  const expiredOtp = expiredAt();
+  const expired = expiredAt();
 
-  const findUser = await prisma.users.findUnique({
+  const findUser = await prisma.users.findFirst({
     where: {
-      username: request.username,
+      OR: [{ username: request.username }, { email: request.email }],
     },
   });
 
   if (findUser) {
     throw new HttpException(409, "User already exists");
   }
+
   request.password = await hash(request.password);
 
   const createUser = await prisma.users.create({
     data: {
+      fullname: request.fullname,
       username: request.username,
       email: request.email,
       password: request.password,
       email: request.email,
       otp: otp,
-      otp_expired_at: expiredOtp,
+      otp_expired_at: expired,
     },
     select: {
       id: true,
+      fullname: true,
       username: true,
       email: true,
       password: true,
@@ -43,6 +46,7 @@ export const register = async (request) => {
   const token = jwt.sign(
     {
       email: createUser.email,
+      fullname: createUser.fullname,
     },
     process.env.JWT_KEY
   );
@@ -51,7 +55,7 @@ export const register = async (request) => {
     request.email,
     "Verification account",
     `Your OTP is: ${otp}`,
-    `<h1>Welcome ${request.email}!</h1><p>Your OTP is: <b>${otp}</b>. It expires in 15 minutes.</p>`
+    `<h1>Welcome ${request.fullname}!</h1><p>Your OTP is: <b>${otp}</b>. It expires in 2 minutes.</p>`
   );
 
   if (!mail.success) {
@@ -104,7 +108,7 @@ export const resendOtp = async (request) => {
     request.email,
     "Verification account",
     `Your OTP is: ${otp}`,
-    `<h1>Welcome ${request.email}!</h1><p>Your OTP is: <b>${otp}</b>. It expires in 15 minutes.</p>`
+    `<h1>Welcome ${request.fullname}!</h1><p>Your OTP is: <b>${otp}</b>. It expires in 2 minutes.</p>`
   );
 
   if (!mail.success) {
@@ -152,5 +156,88 @@ export const verifyOtp = async (request) => {
 
   return {
     message: "Verification success",
+  };
+};
+
+export const forgotPassword = async (request) => {
+  const findEmail = await prisma.users.findUnique({
+    where: {
+      email: request.email,
+    },
+  });
+
+  if (!findEmail) {
+    throw new Error(404, "Email not found");
+  }
+
+  const token = jwt.sign(
+    {
+      email: request.email,
+    },
+    process.env.JWT_KEY
+  );
+
+  const link = `${request.protocol}://${request.host}/reset-password/${token}`;
+  const mail = await sendEmail(
+    request.email,
+    "Reset Password",
+    `Hello, ${findEmail.fullname}`,
+    `<h1>Hello, ${findEmail.fullname}</h1><p>Here link to reset password: <b><a href="${link}">${link}</a></b></p>`
+  );
+
+  if (!mail.success) {
+    throw new Error(500, "Failed to sent email");
+  }
+
+  return {
+    message: "Reset password link sent to your email",
+  };
+};
+
+export const resetPassword = async (request) => {
+  const password = await hash(request.password);
+  await prisma.users.update({
+    where: {
+      email: request.email,
+    },
+    data: {
+      password: password,
+    },
+  });
+
+  return {
+    message: "Reset password succesfuly",
+  };
+};
+
+export const changePassword = async (request) => {
+  const user = await prisma.users.findFirst({
+    where: {
+      id: request.id,
+    },
+  });
+
+  if (!user) {
+    throw new HttpException(404, "User not found");
+  }
+
+  const isOldPassword = await verify(user.password, request.oldPass);
+  if (!isOldPassword) {
+    throw new HttpException(400, "Old password is incorrect");
+  }
+
+  const newPassword = await hash(request.newPass);
+
+  await prisma.users.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      password: newPassword,
+    },
+  });
+
+  return {
+    message: "Change password succesfully",
   };
 };
