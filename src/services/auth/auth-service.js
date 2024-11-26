@@ -4,12 +4,14 @@ import { hash, verify } from "argon2";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { request } from "express";
-import { generatorOtp, expiredAt } from "../../utilities/otp/otp-generator.js";
+import { generator } from "../../utilities/otp/otp-generator.js";
 import { sendEmail } from "../../utilities/mailer/mailer.js";
+import { otpTemplate } from "../../utilities/mailer/template-otp.js";
+import { resetPasswordTemplate } from "../../utilities/mailer/template-reset-password.js";
 
 export const register = async (request) => {
-  const otp = generatorOtp();
-  const expired = expiredAt();
+  const otp = generator.otp();
+  const expired = generator.expired();
 
   const findUser = await prisma.users.findFirst({
     where: {
@@ -56,12 +58,9 @@ export const register = async (request) => {
     process.env.JWT_KEY
   );
 
-  const mail = await sendEmail(
-    request.email,
-    "Verification account",
-    `Your OTP is: ${otp}`,
-    `<h1>Welcome ${request.fullname}!</h1><p>Your OTP is: <b>${otp}</b>. It expires in 2 minutes.</p>`
-  );
+  const html = otpTemplate(request.fullname, otp);
+
+  const mail = await sendEmail(request.email, "Verifikasi akun", html);
 
   if (!mail.success) {
     throw new HttpException(500, "Failed send OTP to email");
@@ -106,15 +105,21 @@ export const login = async (request) => {
 };
 
 export const resendOtp = async (request) => {
-  const otp = generatorOtp();
-  const expired = expiredAt();
+  const user = await prisma.users.findFirst({
+    where: {
+      email: request.email,
+    },
+  });
 
-  const mail = await sendEmail(
-    request.email,
-    "Verification account",
-    `Your OTP is: ${otp}`,
-    `<h1>Welcome ${request.fullname}!</h1><p>Your OTP is: <b>${otp}</b>. It expires in 2 minutes.</p>`
-  );
+  if (user.isVerifed) {
+    throw new HttpException(400, "Account has been verified");
+  }
+  const otp = generator.otp();
+  const expired = generator.expired();
+
+  const html = otpTemplate(request.fullname, otp);
+
+  const mail = await sendEmail(request.email, "Verifikasi akun", html);
 
   if (!mail.success) {
     throw new HttpException(500, "Failed send OTP to email");
@@ -179,16 +184,13 @@ export const forgotPassword = async (request) => {
     {
       email: request.email,
     },
-    process.env.JWT_KEY
+    process.env.JWT_KEY,
+    { expiresIn: "1h" }
   );
 
   const link = `${request.protocol}://${request.host}/reset-password/${token}`;
-  const mail = await sendEmail(
-    request.email,
-    "Reset Password",
-    `Hello, ${findEmail.fullname}`,
-    `<h1>Hello, ${findEmail.fullname}</h1><p>Here link to reset password: <b><a href="${link}">${link}</a></b></p>`
-  );
+  const html = resetPasswordTemplate(findEmail.fullname, link);
+  const mail = await sendEmail(request.email, "Atur ulang kata sandi", html);
 
   if (!mail.success) {
     throw new Error(500, "Failed to sent email");
