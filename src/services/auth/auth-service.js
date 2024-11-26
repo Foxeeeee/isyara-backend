@@ -32,6 +32,11 @@ export const register = async (request) => {
       email: request.email,
       otp: otp,
       otp_expired_at: expired,
+      profile: {
+        create: {
+          fullname: request.fullname,
+        },
+      },
     },
     select: {
       id: true,
@@ -45,8 +50,8 @@ export const register = async (request) => {
 
   const token = jwt.sign(
     {
-      email: createUser.email,
-      fullname: createUser.fullname,
+      email: request.email,
+      fullname: request.fullname,
     },
     process.env.JWT_KEY
   );
