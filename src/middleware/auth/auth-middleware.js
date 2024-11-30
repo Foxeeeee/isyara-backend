@@ -20,7 +20,7 @@ export const authMiddleware = {
     } catch (err) {}
   },
 
-  passHandler: (req, res, next) => {
+  paramHandler: (req, res, next) => {
     try {
       const token = req.params.token;
       if (!token) {

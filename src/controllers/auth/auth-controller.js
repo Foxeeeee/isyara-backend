@@ -21,15 +21,19 @@ export const authController = {
     try {
       const { fullname, username, email, password, otp, otp_expired_at } =
         registrationSchema.parse(req.body);
-      const user = await register({
+      const host = req.headers.host;
+      const protocol = req.protocol;
+      const result = await register({
         fullname,
         username,
         email,
         password,
         otp,
         otp_expired_at,
+        host,
+        protocol,
       });
-      return res.status(201).json(user);
+      return res.status(201).json(result);
     } catch (error) {
       next(error);
     }

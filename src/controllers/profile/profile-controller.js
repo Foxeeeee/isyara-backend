@@ -1,7 +1,6 @@
 import {
   getProfile,
-  updateBio,
-  uploadPicture,
+  editProfile,
 } from "../../services/auth/profile/profile-service.js";
 import { fileSchema } from "../../schemas/auth/profile/profile-schema.js";
 import { HttpException } from "../../middleware/error.js";
@@ -17,22 +16,11 @@ export const profileController = {
     }
   },
 
-  uploadFile: async (req, res, next) => {
+  editProfile: async (req, res, next) => {
     try {
-      const { id } = req.user;
+      const { id, bio, fullname } = req.user;
       const file = fileSchema.parse(req.file);
-      const result = await uploadPicture({ id, file });
-      return res.status(200).json(result);
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  updateBio: async (req, res, next) => {
-    try {
-      const { id } = req.user;
-      const { bio } = req.body;
-      const result = await updateBio({ id, bio });
+      const result = await editProfile({ id, fullname, bio, file });
       return res.status(200).json(result);
     } catch (error) {
       next(error);
