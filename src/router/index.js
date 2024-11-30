@@ -10,14 +10,14 @@ router.post("/register", authController.register);
 router.post("/login", authController.login);
 router.post("/verification-otp", authController.verifyOtp);
 router.post(
-  "/resend-otp",
-  authMiddleware.authHandler,
+  "/resend-otp/:token",
+  authMiddleware.paramHandler,
   authController.resendOtp
 );
 router.post("/forgot-password", authController.forgotPassword);
 router.post(
   "/reset-password/:token",
-  authMiddleware.passHandler,
+  authMiddleware.paramHandler,
   authController.resetPassword
 );
 router.patch(
@@ -33,17 +33,11 @@ router.get(
 );
 
 router.post(
-  "/upload-picture",
+  "/edit-profile",
   upload,
   authMiddleware.authHandler,
-  profileController.uploadFile
-);
-
-router.post(
-  "/update-bio",
-  authMiddleware.authHandler,
-  profileController.updateBio
+  profileController.editProfile
 );
 
 router.use(authMiddleware.authHandler);
-router.use(authMiddleware.passHandler);
+router.use(authMiddleware.paramHandler);

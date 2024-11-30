@@ -18,7 +18,7 @@ export const getProfile = async (request) => {
   };
 };
 
-export const uploadPicture = async (request) => {
+export const editProfile = async (request) => {
   if (!request.file) {
     throw new HttpException(400, "No file provided for upload");
   }
@@ -28,31 +28,20 @@ export const uploadPicture = async (request) => {
     throw new HttpException(500, "Failed to upload file to cloud storage");
   }
 
+  const updateData = {};
+  if (fileUrl) updateData.picture = fileUrl;
+  if (request.bio) updateData.bio = request.bio;
+  if (request.fullname) updateData.fullname = request.fullname;
+
   await prisma.profile.update({
     where: {
       userId: request.id,
     },
-    data: {
-      picture: fileUrl,
-    },
+    data: updateData,
   });
 
   return {
-    message: "Upload file successfully",
-    fileUrl,
-  };
-};
-
-export const updateBio = async (request) => {
-  await prisma.profile.update({
-    where: {
-      userId: request.id,
-    },
-    data: {
-      bio: request.bio,
-    },
-  });
-  return {
-    message: "Bio updated successfully",
+    message: "Profile has been updated",
+    ...(fileUrl && { fileUrl }),
   };
 };

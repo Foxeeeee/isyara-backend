@@ -69,7 +69,7 @@ export const register = async (request) => {
   return {
     message: "User created successfully, check your email for verification",
     data: createUser,
-    temporary_token: token,
+    resend_otp: `${request.protocol}://${request.host}/resend-otp/${token}`,
   };
 };
 
