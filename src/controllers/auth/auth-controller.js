@@ -91,8 +91,6 @@ export const authController = {
     try {
       const { id } = req.user;
       const { oldPass, newPass } = req.body;
-      console.log(id);
-      console.log(oldPass);
       const result = await changePassword({ id, oldPass, newPass });
       return res.status(200).json(result);
     } catch (error) {
