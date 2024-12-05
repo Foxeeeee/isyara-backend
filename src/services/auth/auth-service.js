@@ -6,8 +6,7 @@ import "dotenv/config";
 import { request } from "express";
 import { generator } from "../../utilities/otp/otp-generator.js";
 import { sendEmail } from "../../utilities/mailer/mailer.js";
-import { otpTemplate } from "../../utilities/mailer/template-otp.js";
-import { resetPasswordTemplate } from "../../utilities/mailer/template-reset-password.js";
+import { emailTemplate } from "../../utilities/mailer/email-template.js";
 
 export const register = async (request) => {
   const otp = generator.otp();
@@ -52,13 +51,15 @@ export const register = async (request) => {
 
   const token = jwt.sign(
     {
+      id: createUser.id,
       email: request.email,
-      fullname: request.fullname,
+      type: "register",
     },
-    process.env.JWT_KEY
+    process.env.JWT_KEY,
+    { expiresIn: "1h" }
   );
 
-  const html = otpTemplate(request.fullname, otp);
+  const html = emailTemplate(request.fullname, otp, "registrasi");
 
   const mail = await sendEmail(request.email, "Verifikasi akun", html);
 
@@ -69,7 +70,7 @@ export const register = async (request) => {
   return {
     message: "User created successfully, check your email for verification",
     data: createUser,
-    resend_otp: `${request.protocol}://${request.host}/resend-otp/${token}`,
+    token: token,
   };
 };
 
@@ -117,7 +118,15 @@ export const resendOtp = async (request) => {
   const otp = generator.otp();
   const expired = generator.expired();
 
-  const html = otpTemplate(request.fullname, otp);
+  if (request.type === "register") {
+    const subject = "register";
+  }
+
+  if (request.type === "forgot-password") {
+    const subject = "atur ulang kata sandi";
+  }
+
+  const html = emailTemplate(request.fullname, otp, subject);
 
   const mail = await sendEmail(request.email, "Verifikasi akun", html);
 
@@ -141,11 +150,11 @@ export const resendOtp = async (request) => {
 export const verifyOtp = async (request) => {
   const user = await prisma.users.findFirst({
     where: {
-      otp: request.otp,
+      email: request.email,
     },
   });
 
-  if (!user) {
+  if (request.otp !== user.otp) {
     throw new HttpException(400, "Invalid OTP");
   }
 
@@ -164,32 +173,53 @@ export const verifyOtp = async (request) => {
     },
   });
 
-  return {
-    message: "Verification success",
-  };
+  if (request.type === "register") {
+    return {
+      message: "Verification success",
+    };
+  }
+
+  if (request.type === "forgot-password") {
+    return {
+      message: "Verification success. Proceed to reset password",
+    };
+  }
 };
 
 export const forgotPassword = async (request) => {
-  const findEmail = await prisma.users.findUnique({
+  const otp = generator.otp();
+  const expired = generator.expired();
+  const user = await prisma.users.findUnique({
     where: {
       email: request.email,
     },
   });
 
-  if (!findEmail) {
+  if (!user) {
     throw new Error(404, "Email not found");
   }
 
+  await prisma.users.update({
+    where: {
+      email: request.email,
+    },
+    data: {
+      otp: otp,
+      otp_expired_at: expired,
+    },
+  });
+
   const token = jwt.sign(
     {
+      id: user.id,
       email: request.email,
+      type: "forgot-password",
     },
     process.env.JWT_KEY,
     { expiresIn: "1h" }
   );
 
-  const link = `${request.protocol}://${request.host}/reset-password/${token}`;
-  const html = resetPasswordTemplate(findEmail.fullname, link);
+  const html = emailTemplate(user.fullname, otp, "atur ulang kata sandi");
   const mail = await sendEmail(request.email, "Atur ulang kata sandi", html);
 
   if (!mail.success) {
@@ -197,7 +227,8 @@ export const forgotPassword = async (request) => {
   }
 
   return {
-    message: "Reset password link sent to your email",
+    message: "OTP sent to email",
+    token: token,
   };
 };
 
