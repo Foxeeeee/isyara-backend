@@ -1,4 +1,4 @@
-export const otpTemplate = (names, otp) => {
+export const emailTemplate = (names, otp, subject) => {
   return `
 <!DOCTYPE html>
 <html>
@@ -40,7 +40,7 @@ export const otpTemplate = (names, otp) => {
 <body>
   <div class="container">
     <p>Halo, ${names}</p>
-    <p>Gunakan kode OTP berikut untuk melanjutkan proses registrasi. Kode ini berlaku selama 2 menit:</p>
+    <p>Gunakan kode OTP berikut untuk melanjutkan proses ${subject.toLowerCase()}. Kode ini berlaku selama 2 menit:</p>
     <div class="otp-code">${otp}</div>
     <p>Jika Anda tidak meminta kode ini, silakan abaikan email ini atau hubungi tim dukungan kami.</p>
     <p>Terima kasih telah menggunakan layanan kami!</p>

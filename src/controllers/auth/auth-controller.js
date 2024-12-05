@@ -21,8 +21,6 @@ export const authController = {
     try {
       const { fullname, username, email, password, otp, otp_expired_at } =
         registrationSchema.parse(req.body);
-      const host = req.headers.host;
-      const protocol = req.protocol;
       const result = await register({
         fullname,
         username,
@@ -30,8 +28,6 @@ export const authController = {
         password,
         otp,
         otp_expired_at,
-        host,
-        protocol,
       });
       return res.status(201).json(result);
     } catch (error) {
@@ -51,7 +47,8 @@ export const authController = {
 
   resendOtp: async (req, res, next) => {
     try {
-      const result = await resendOtp(req.user);
+      const { email, type } = req.user;
+      const result = await resendOtp(email, type);
       return res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -60,8 +57,9 @@ export const authController = {
 
   verifyOtp: async (req, res, next) => {
     try {
+      const { email, type } = req.user;
       const { otp } = verifyOtpSchema.parse(req.body);
-      const result = await verifyOtp({ otp });
+      const result = await verifyOtp({ email, otp, type });
       return res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -70,10 +68,8 @@ export const authController = {
 
   forgotPassword: async (req, res, next) => {
     try {
-      const host = req.headers.host;
-      const protocol = req.protocol;
       const { email } = forgotPassowrdSchema.parse(req.body);
-      const result = await forgotPassword({ email, host, protocol });
+      const result = await forgotPassword({ email });
       return res.status(200).json(result);
     } catch (error) {
       next(error);

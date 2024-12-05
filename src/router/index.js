@@ -7,19 +7,27 @@ import { upload } from "../middleware/multer/multer-middleware.js";
 export const router = Router();
 
 router.post("/register", authController.register);
+
 router.post("/login", authController.login);
-router.post("/verification-otp", authController.verifyOtp);
+
+router.post(
+  "/verification-otp/:token",
+  authMiddleware.paramHandler,
+  authController.verifyOtp
+);
 router.post(
   "/resend-otp/:token",
   authMiddleware.paramHandler,
   authController.resendOtp
 );
+
 router.post("/forgot-password", authController.forgotPassword);
 router.post(
   "/reset-password/:token",
   authMiddleware.paramHandler,
   authController.resetPassword
 );
+
 router.patch(
   "/change-password",
   authMiddleware.authHandler,
