@@ -3,6 +3,7 @@ import { authMiddleware } from "../middleware/auth/auth-middleware.js";
 import { authController } from "../controllers/auth/auth-controller.js";
 import { profileController } from "../controllers/profile/profile-controller.js";
 import { upload } from "../middleware/multer/multer-middleware.js";
+import { proxy } from "../controllers/predict/predict-controller.js";
 
 export const router = Router();
 
@@ -46,6 +47,8 @@ router.post(
   authMiddleware.authHandler,
   profileController.editProfile
 );
+
+router.post("/predict", proxy);
 
 router.use(authMiddleware.authHandler);
 router.use(authMiddleware.paramHandler);

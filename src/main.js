@@ -1,4 +1,5 @@
 import { app } from "./application/server.js";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import { deleteUnverifiedUsers } from "./utilities/auto-delete-users/auto-delete.js";
 import cron from "node-cron";
 
