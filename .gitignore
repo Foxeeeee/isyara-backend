@@ -3,4 +3,6 @@ node_modules
 .env
 migrations
 project-isyara.json
+key-firestore.json
 .venv
+Dockerfile
