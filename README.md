@@ -8,58 +8,70 @@
 
 ## Overview
 
-This project is a RESTful API built with Express.js. It provides backend functionality for [your application name or purpose]. The API is designed to handle CRUD operations efficiently, adhering to REST principles.
+This project is a RESTful API built with Express.js. It provides backend functionality for **Isyara**, an application designed to bridge communication gaps for individuals with speech impairments by translating sign language into readable or audible formats. The API supports seamless CRUD operations, adheres to RESTful principles.
 
 ## Installation
 
-1. Clone the repository:
-   using https:
+### Clone the Repository
 
-   ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   ```
+Using HTTPS:
 
-   using ssh:
+```bash
+git clone https://github.com/yourusername/your-repo-name.git
+```
 
-   ```bash
-   git clone git@github.com:Isyara-project/isyara-backend.git
-   ```
+Using SSH:
 
-2. Navigate to the project directory:
+```bash
+git clone git@github.com:Isyara-project/isyara-backend.git
+```
 
-   ```bash
-   cd your-repo-name
-   ```
+### Navigate to the Project Directory
 
-3. Install dependencies:
+```bash
+cd isyara-backend
+```
 
-   ```bash
-   npm install
-   ```
+### Install Dependencies
 
-4. Start the server:
+```bash
+npm install
+```
 
-   ```bash
-   npm start
-   ```
+### Start the Server
 
-5. Run in development mode with hot reload:
-   ```bash
-   npm run dev
-   ```
+For production:
+
+```bash
+npm start
+```
+
+For development with hot reload:
+
+```bash
+npm run dev
+```
 
 ## Contributing
 
-1. Create a new branch:
+### Steps to Contribute
+
+1. Create a new branch for your feature:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
-2. Make changes and commit:
+
+2. Make your changes and commit them:
+
    ```bash
    git commit -m "Add your message here"
    ```
-3. Push to your branch:
+
+3. Push the changes to your branch:
+
    ```bash
    git push origin feature/your-feature-name
    ```
-4. Submit a pull request.
+
+4. Open a pull request for review and merge.
