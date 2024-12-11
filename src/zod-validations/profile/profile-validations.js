@@ -1,7 +1,7 @@
 import { z } from "zod";
 import path from "path";
 
-export const fileSchema = z.object({
+export const fileValidation = z.object({
   mimetype: z.string().refine((type) => type.startsWith("image/"), {
     message: "Only image files are allowed",
   }),

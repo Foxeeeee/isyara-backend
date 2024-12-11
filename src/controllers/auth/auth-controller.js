@@ -8,19 +8,19 @@ import {
   verifyOtp,
 } from "../../services/auth/auth-service.js";
 import {
-  forgotPassowrdSchema,
-  loginSchema,
-  registrationSchema,
-  verifyOtpSchema,
-  resetPasswordSchema,
-} from "../../schemas/auth/auth-schema.js";
+  forgotPassowrdValidation,
+  loginValidation,
+  registrationValidation,
+  verifyOtpValidation,
+  resetPasswordValidation,
+} from "../../zod-validations/auth/auth-validations.js";
 import { HttpException } from "../../middleware/error.js";
 
 export const authController = {
   register: async (req, res, next) => {
     try {
       const { fullname, username, email, password, otp, otp_expired_at } =
-        registrationSchema.parse(req.body);
+        registrationValidation.parse(req.body);
       const result = await register({
         fullname,
         username,
@@ -37,7 +37,7 @@ export const authController = {
 
   login: async (req, res, next) => {
     try {
-      const { identifier, password } = loginSchema.parse(req.body);
+      const { identifier, password } = loginValidation.parse(req.body);
       const result = await login({ identifier, password });
       return res.status(200).json(result);
     } catch (error) {
@@ -58,7 +58,7 @@ export const authController = {
   verifyOtp: async (req, res, next) => {
     try {
       const { email, type } = req.user;
-      const { otp } = verifyOtpSchema.parse(req.body);
+      const { otp } = verifyOtpValidation.parse(req.body);
       const result = await verifyOtp({ email, otp, type });
       return res.status(200).json(result);
     } catch (error) {
@@ -68,7 +68,7 @@ export const authController = {
 
   forgotPassword: async (req, res, next) => {
     try {
-      const { email } = forgotPassowrdSchema.parse(req.body);
+      const { email } = forgotPassowrdValidation.parse(req.body);
       const result = await forgotPassword({ email });
       return res.status(200).json(result);
     } catch (error) {
@@ -79,7 +79,7 @@ export const authController = {
   resetPassword: async (req, res, next) => {
     try {
       const { email } = req.user;
-      const { password } = resetPasswordSchema.parse(req.body);
+      const { password } = resetPasswordValidation.parse(req.body);
       const result = await resetPassword({ email, password });
       return res.status(200).json(result);
     } catch (error) {

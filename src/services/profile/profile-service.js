@@ -1,7 +1,7 @@
-import { prisma } from "../../../application/database.js";
-import { HttpException } from "../../../middleware/error.js";
+import { prisma } from "../../application/database.js";
+import { HttpException } from "../../middleware/error.js";
 import { request } from "express";
-import { uploadFile } from "../../../utilities/gcs/gcs.js";
+import { uploadFile } from "../../utilities/gcs/gcs.js";
 
 export const getProfile = async (request) => {
   const profile = await prisma.profile.findUnique({
