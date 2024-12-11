@@ -40,7 +40,7 @@ npm install
 
 ### Start the Server
 
-For production:
+Start the server:
 
 ```bash
 npm start
