@@ -3,7 +3,7 @@ import { authMiddleware } from "../middleware/auth/auth-middleware.js";
 import { authController } from "../controllers/auth/auth-controller.js";
 import { profileController } from "../controllers/profile/profile-controller.js";
 import { upload } from "../middleware/multer/multer-middleware.js";
-import { proxy } from "../controllers/predict/predict-controller.js";
+import { handleFeedback, historiesFeedback } from '../controllers/feedback/feedback-handler.js';
 
 export const router = Router();
 
@@ -48,7 +48,9 @@ router.post(
   profileController.editProfile
 );
 
-router.post("/predict", proxy);
+router.post('/feedback', handleFeedback);
+
+router.get('/feedback/histories', historiesFeedback);
 
 router.use(authMiddleware.authHandler);
 router.use(authMiddleware.paramHandler);
