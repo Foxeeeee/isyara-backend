@@ -1,8 +1,8 @@
 import {
   getProfile,
   editProfile,
-} from "../../services/auth/profile/profile-service.js";
-import { fileSchema } from "../../schemas/auth/profile/profile-schema.js";
+} from "../../services/profile/profile-service.js";
+import { fileValidation } from "../../zod-validations/profile/profile-validations.js";
 import { HttpException } from "../../middleware/error.js";
 
 export const profileController = {
@@ -19,7 +19,7 @@ export const profileController = {
   editProfile: async (req, res, next) => {
     try {
       const { id, bio, fullname } = req.user;
-      const file = fileSchema.parse(req.file);
+      const file = fileValidation.parse(req.file);
       const result = await editProfile({ id, fullname, bio, file });
       return res.status(200).json(result);
     } catch (error) {

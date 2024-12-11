@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const registrationSchema = z.object({
+export const registrationValidation = z.object({
   fullname: z.string().min(1, "Fullname must be filled in"),
   username: z
     .string()
@@ -27,7 +27,7 @@ export const registrationSchema = z.object({
     ),
 });
 
-export const loginSchema = z.object({
+export const loginValidation = z.object({
   identifier: z
     .string()
     .min(1, "Username or Email must be filled in")
@@ -39,18 +39,18 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password must be filled in"),
 });
 
-export const verifyOtpSchema = z.object({
+export const verifyOtpValidation = z.object({
   otp: z.string().min(6, "Must be a valid OTP"),
 });
 
-export const forgotPassowrdSchema = z.object({
+export const forgotPassowrdValidation = z.object({
   email: z
     .string()
     .min(1, "Email must be filled in")
     .email("Invalid email address"),
 });
 
-export const resetPasswordSchema = z.object({
+export const resetPasswordValidation = z.object({
   password: z
     .string()
     .min(1, "Password must be filled in")
