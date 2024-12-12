@@ -48,7 +48,7 @@ export const authController = {
   resendOtp: async (req, res, next) => {
     try {
       const { email, type } = req.user;
-      const result = await resendOtp(email, type);
+      const result = await resendOtp({ email, type });
       return res.status(200).json(result);
     } catch (error) {
       next(error);
