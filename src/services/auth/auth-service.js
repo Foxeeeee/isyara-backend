@@ -117,21 +117,22 @@ export const resendOtp = async (request) => {
   }
   const otp = generator.otp();
   const expired = generator.expired();
+  const subjectMap = {
+    register: "Register",
+    "forgot-password": "Atur ulang kata sandi",
+  };
 
-  if (request.type === "register") {
-    const subject = "register";
+  const subject = subjectMap[request.type];
+
+  if (!subject) {
+    throw new HttpException(400, "Invalid request type");
   }
 
-  if (request.type === "forgot-password") {
-    const subject = "atur ulang kata sandi";
-  }
+  const html = emailTemplate(user.fullname, otp, subject.toLowerCase());
+  const email = await sendEmail(request.email, subject, html);
 
-  const html = emailTemplate(request.fullname, otp, subject);
-
-  const mail = await sendEmail(request.email, "Verifikasi akun", html);
-
-  if (!mail.success) {
-    throw new HttpException(500, "Failed send OTP to email");
+  if (!email.success) {
+    throw new HttpException(500, "Failed to sent email");
   }
 
   await prisma.users.update({
