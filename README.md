@@ -8,7 +8,7 @@
 
 ## Overview
 
-This project is a RESTful API built with Express.js. It provides backend functionality for **Isyara**, an application designed to bridge communication gaps for individuals with speech impairments by translating sign language into readable or audible formats. The API supports seamless CRUD operations, adheres to RESTful principles.
+This project is a RESTful API built with Express.js. It provides backend functionality for **Isyara**, an application designed to bridge communication gaps for individuals with speech impairments by translating sign language into readable or formats. The API supports seamless CRUD operations, adheres to RESTful principles.
 
 ## Installation
 
